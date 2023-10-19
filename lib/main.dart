@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'ffi.io.dart' show api;
 
 void main() {
@@ -32,11 +31,12 @@ class AppPage extends StatefulWidget {
 
 class _AppPageState extends State<AppPage> {
   bool isItDarkOut = false;
+  Timer? timer;
 
   @override
   void initState() {
     super.initState();
-    Timer.periodic(
+    timer = Timer.periodic(
         const Duration(minutes: 1), ((timer) => _evaluateDarkness()));
   }
 
@@ -69,5 +69,11 @@ class _AppPageState extends State<AppPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [Text(message, style: textStyle)],
         )));
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 }
