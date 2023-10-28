@@ -11,9 +11,19 @@ import 'package:uuid/uuid.dart';
 import 'dart:ffi' as ffi;
 
 abstract class IsItDarkOutBackend {
-  Future<bool> isItDarkOut({dynamic hint});
+  Future<bool> isItDarkOut({required Coordinates position, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kIsItDarkOutConstMeta;
+}
+
+class Coordinates {
+  final double latitude;
+  final double longitude;
+
+  const Coordinates({
+    required this.latitude,
+    required this.longitude,
+  });
 }
 
 class IsItDarkOutBackendImpl implements IsItDarkOutBackend {
@@ -25,13 +35,14 @@ class IsItDarkOutBackendImpl implements IsItDarkOutBackend {
   factory IsItDarkOutBackendImpl.wasm(FutureOr<WasmModule> module) =>
       IsItDarkOutBackendImpl(module as ExternalLibrary);
   IsItDarkOutBackendImpl.raw(this._platform);
-  Future<bool> isItDarkOut({dynamic hint}) {
+  Future<bool> isItDarkOut({required Coordinates position, dynamic hint}) {
+    var arg0 = _platform.api2wire_box_autoadd_coordinates(position);
     return _platform.executeNormal(FlutterRustBridgeTask(
-      callFfi: (port_) => _platform.inner.wire_is_it_dark_out(port_),
+      callFfi: (port_) => _platform.inner.wire_is_it_dark_out(port_, arg0),
       parseSuccessData: _wire2api_bool,
-      parseErrorData: _wire2api_String,
+      parseErrorData: null,
       constMeta: kIsItDarkOutConstMeta,
-      argValues: [],
+      argValues: [position],
       hint: hint,
     ));
   }
@@ -39,7 +50,7 @@ class IsItDarkOutBackendImpl implements IsItDarkOutBackend {
   FlutterRustBridgeTaskConstMeta get kIsItDarkOutConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
         debugName: "is_it_dark_out",
-        argNames: [],
+        argNames: ["position"],
       );
 
   void dispose() {
@@ -47,25 +58,17 @@ class IsItDarkOutBackendImpl implements IsItDarkOutBackend {
   }
 // Section: wire2api
 
-  String _wire2api_String(dynamic raw) {
-    return raw as String;
-  }
-
   bool _wire2api_bool(dynamic raw) {
     return raw as bool;
-  }
-
-  int _wire2api_u8(dynamic raw) {
-    return raw as int;
-  }
-
-  Uint8List _wire2api_uint_8_list(dynamic raw) {
-    return raw as Uint8List;
   }
 }
 
 // Section: api2wire
 
+@protected
+double api2wire_f64(double raw) {
+  return raw;
+}
 // Section: finalizer
 
 class IsItDarkOutBackendPlatform
@@ -75,9 +78,28 @@ class IsItDarkOutBackendPlatform
 
 // Section: api2wire
 
+  @protected
+  ffi.Pointer<wire_Coordinates> api2wire_box_autoadd_coordinates(
+      Coordinates raw) {
+    final ptr = inner.new_box_autoadd_coordinates_0();
+    _api_fill_to_wire_coordinates(raw, ptr.ref);
+    return ptr;
+  }
+
 // Section: finalizer
 
 // Section: api_fill_to_wire
+
+  void _api_fill_to_wire_box_autoadd_coordinates(
+      Coordinates apiObj, ffi.Pointer<wire_Coordinates> wireObj) {
+    _api_fill_to_wire_coordinates(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_coordinates(
+      Coordinates apiObj, wire_Coordinates wireObj) {
+    wireObj.latitude = api2wire_f64(apiObj.latitude);
+    wireObj.longitude = api2wire_f64(apiObj.longitude);
+  }
 }
 
 // ignore_for_file: camel_case_types, non_constant_identifier_names, avoid_positional_boolean_parameters, annotate_overrides, constant_identifier_names
@@ -178,17 +200,30 @@ class IsItDarkOutBackendWire implements FlutterRustBridgeWireBase {
 
   void wire_is_it_dark_out(
     int port_,
+    ffi.Pointer<wire_Coordinates> position,
   ) {
     return _wire_is_it_dark_out(
       port_,
+      position,
     );
   }
 
-  late final _wire_is_it_dark_outPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
-          'wire_is_it_dark_out');
-  late final _wire_is_it_dark_out =
-      _wire_is_it_dark_outPtr.asFunction<void Function(int)>();
+  late final _wire_is_it_dark_outPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64,
+              ffi.Pointer<wire_Coordinates>)>>('wire_is_it_dark_out');
+  late final _wire_is_it_dark_out = _wire_is_it_dark_outPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_Coordinates>)>();
+
+  ffi.Pointer<wire_Coordinates> new_box_autoadd_coordinates_0() {
+    return _new_box_autoadd_coordinates_0();
+  }
+
+  late final _new_box_autoadd_coordinates_0Ptr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<wire_Coordinates> Function()>>(
+          'new_box_autoadd_coordinates_0');
+  late final _new_box_autoadd_coordinates_0 = _new_box_autoadd_coordinates_0Ptr
+      .asFunction<ffi.Pointer<wire_Coordinates> Function()>();
 
   void free_WireSyncReturn(
     WireSyncReturn ptr,
@@ -206,6 +241,14 @@ class IsItDarkOutBackendWire implements FlutterRustBridgeWireBase {
 }
 
 final class _Dart_Handle extends ffi.Opaque {}
+
+final class wire_Coordinates extends ffi.Struct {
+  @ffi.Double()
+  external double latitude;
+
+  @ffi.Double()
+  external double longitude;
+}
 
 typedef DartPostCObjectFnType = ffi.Pointer<
     ffi.NativeFunction<

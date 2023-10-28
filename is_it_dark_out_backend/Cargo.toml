@@ -12,3 +12,6 @@ crate-type = ["staticlib", "cdylib"]
 sunrise = "1"
 chrono = "0.4.31"
 flutter_rust_bridge = "1"
+
+#[target.'cfg(target_os = "android")'.dependencies]
+j4rs = {version = "0.17"}

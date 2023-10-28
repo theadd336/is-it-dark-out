@@ -1,12 +1,8 @@
+use crate::impls;
+pub use crate::impls::Coordinates;
+
 static mut COUNTER: u32 = 0;
 
-pub fn is_it_dark_out() -> Result<bool, String> {
-    unsafe {
-        COUNTER += 1;
-        if COUNTER % 2 == 0 {
-            Ok(false)
-        } else {
-            Ok(true)
-        }
-    }
+pub fn is_it_dark_out(position: Coordinates) -> bool {
+    impls::is_it_dark_out(position)
 }

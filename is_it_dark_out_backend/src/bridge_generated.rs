@@ -20,16 +20,21 @@ use std::sync::Arc;
 
 // Section: imports
 
+use crate::impls::Coordinates;
+
 // Section: wire functions
 
-fn wire_is_it_dark_out_impl(port_: MessagePort) {
+fn wire_is_it_dark_out_impl(port_: MessagePort, position: impl Wire2Api<Coordinates> + UnwindSafe) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap::<_, _, _, bool, _>(
         WrapInfo {
             debug_name: "is_it_dark_out",
             port: Some(port_),
             mode: FfiCallMode::Normal,
         },
-        move || move |task_callback| is_it_dark_out(),
+        move || {
+            let api_position = position.wire2api();
+            move |task_callback| Result::<_, ()>::Ok(is_it_dark_out(api_position))
+        },
     )
 }
 // Section: wrapper structs
@@ -52,6 +57,12 @@ where
 {
     fn wire2api(self) -> Option<T> {
         (!self.is_null()).then(|| self.wire2api())
+    }
+}
+
+impl Wire2Api<f64> for f64 {
+    fn wire2api(self) -> f64 {
+        self
     }
 }
 // Section: impl IntoDart

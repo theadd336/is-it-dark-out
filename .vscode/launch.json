@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "is-it-dark-out",
+            "request": "launch",
+            "type": "dart",
+            "toolArgs": [
+                "--host-vmservice-port=12345",
+                "--dds-port=12346"
+            ]
+        },
+        {
+            "name": "is-it-dark-out (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "is-it-dark-out (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
